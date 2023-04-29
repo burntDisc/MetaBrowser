@@ -1,6 +1,7 @@
 #pragma once
 
 #include<glad/glad.h>
+#include <string>
 
 class Shader
 {
@@ -17,6 +18,7 @@ public:
 	// Deletes the Shader Program
 	void Delete();
 private:
+	std::string GetFileContents(const char* filename);
 	// Checks if the different Shaders have compiled properly
 	void CompileErrors(unsigned int shader, const char* type);
 };

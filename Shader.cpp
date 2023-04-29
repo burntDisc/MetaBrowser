@@ -1,18 +1,17 @@
 #include "Shader.h"
 
 #include <glm/glm.hpp>
-#include <string>
 #include <iostream>
+#include<fstream>
 
-#include "FileLoader.h"
 
 // Constructor that build the Shader Program from 3 different shaders
 Shader::Shader(const char* vertexFile, const char* geometryFile, const char* fragmentFile)
 {
 	// Read vertexFile and fragmentFile and store the strings
-	std::string vertexCode = FileLoader::GetFileContents(vertexFile);
-	std::string geometryCode = FileLoader::GetFileContents(geometryFile);
-	std::string fragmentCode = FileLoader::GetFileContents(fragmentFile);
+	std::string vertexCode = GetFileContents(vertexFile);
+	std::string geometryCode = GetFileContents(geometryFile);
+	std::string fragmentCode = GetFileContents(fragmentFile);
 
 	// Convert the shader source strings into character arrays
 	const char* vertexSource = vertexCode.c_str();
@@ -68,8 +67,8 @@ Shader::Shader(const char* vertexFile, const char* geometryFile, const char* fra
 Shader::Shader(const char* vertexFile, const char* fragmentFile)
 {
 	// Read vertexFile and fragmentFile and store the strings
-	std::string vertexCode = FileLoader::GetFileContents(vertexFile);
-	std::string fragmentCode = FileLoader::GetFileContents(fragmentFile);
+	std::string vertexCode = GetFileContents(vertexFile);
+	std::string fragmentCode = GetFileContents(fragmentFile);
 
 	// Convert the shader source strings into character arrays
 	const char* vertexSource = vertexCode.c_str();
@@ -108,6 +107,22 @@ Shader::Shader(const char* vertexFile, const char* fragmentFile)
 	glDeleteShader(fragmentShader);
 }
 
+
+std::string Shader::GetFileContents(const char* filename)
+{
+	std::ifstream in(filename, std::ios::binary);
+	if (in)
+	{
+		std::string contents;
+		in.seekg(0, std::ios::end);
+		contents.resize(in.tellg());
+		in.seekg(0, std::ios::beg);
+		in.read(&contents[0], contents.size());
+		in.close();
+		return(contents);
+	}
+	throw(errno);
+}
 // Activates the Shader Program
 void Shader::Activate()
 {
