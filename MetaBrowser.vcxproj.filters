@@ -36,7 +36,7 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MapGen.cpp">
+    <ClCompile Include="SpatialIndexer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -53,7 +53,7 @@
     <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MapGen.h">
+    <ClInclude Include="SpatialIndexer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

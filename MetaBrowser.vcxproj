@@ -146,7 +146,7 @@
     <ClCompile Include="..\05t4r\libraries\include\glad\glad.c" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="MapGen.cpp" />
+    <ClCompile Include="SpatialIndexer.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="stb_image.cpp" />
@@ -154,7 +154,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Drawable.h" />
-    <ClInclude Include="MapGen.h" />
+    <ClInclude Include="SpatialIndexer.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Skybox.h" />
   </ItemGroup>
