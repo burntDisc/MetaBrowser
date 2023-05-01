@@ -1,9 +1,15 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 
 #include <iostream>
 #include "Skybox.h"
 #include "Camera.h"
+#include "Player.h"
+#include "InputHandler.h"
+#include "GameObject.h"
+#include "MotionHandler.h"
+#include "Triangle.h"
 
 // TODO update filesystem include here------on;ly used for finding parentdir----------------
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
@@ -58,39 +64,79 @@ int main()
 	//glCullFace(GL_FRONT);
 	// Uses counter clock-wise standard
 	//glFrontFace(GL_CCW);
-		// Create SkyBox----------------------------------------------------------------------
-
+	// 
+	
+	// Create SkyBox---------------------------------------------------------------------
 	Shader skyboxShader("shaders/skybox.vert", "shaders/skybox.frag");
-
 	std::string parentDir = fs::current_path().string();
 	std::string skyboxFacesDirectory = parentDir + "/models/skybox/";
 	Skybox skybox(skyboxShader, skyboxFacesDirectory);
 
-	glm::vec3 translation = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::vec3 orientation = glm::vec3(1.0f, 0.0f, 0.0f);
+	// Create Object---------------------------------------------------------------------
+	Shader standardShader("shaders/standard.vert", "shaders/standard.frag");
+	standardShader.Activate();
+	glm::vec4 lightColor = glm::vec4(1.2f, 1.2f, 1.2f, 1.2f);
+	glm::vec3 lightPos = glm::vec3(20.0f, 20.0f, 20.0f);
+	glUniform4f(glGetUniformLocation(standardShader.ID, "lightColor"),
+		lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+	glUniform3f(glGetUniformLocation(standardShader.ID, "lightPos"),
+		lightPos.x, lightPos.y, lightPos.z);
+
+	std::string specPath = parentDir + "/models/errorplane/scene.gltf";
+	glm::vec3 specTranslation(0.0f, -500.0f, 0.0f);
+	glm::quat specRotation = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::vec3 specScale(100.0f, 100.0f, 100.0f);
+	GameObject spec(
+		standardShader,
+		specPath.c_str(),
+		specTranslation,
+		specScale,
+		specRotation
+	);
+	MotionHandler::AddSolidObject(&spec);
+
+	// create Triangle----------------------------------------------------------------------
+	Shader rawShader("shaders/raw.vert", "shaders/raw.frag");
+	Triangle triangle(rawShader);
+	MotionHandler::AddSolidObject(&triangle);
+
+	// create player----------------------------------------------------------------------
+	Player player(glm::vec3(3.0f, 1000.0f, 10.0f));
+
+	//create camera-----------------------------------------------------------------------
 	float FOV = 45.0f;
 	Camera camera(width, height);
-	camera.Bind(&translation, &orientation, &FOV);
-
+	camera.Bind(&player.translation, &player.orientation, &FOV);
 	camera.SetSkyboxUniforms(skyboxShader);
 
 	while (!glfwWindowShouldClose(window))
 	{
-
-
 		// Specify the color of the background GREEN For debug
 		// (Skybox Draws over)
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		// Clean the back buffer and depth buffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		double time = glfwGetTime();
+
+		InputHandler::UpdateGamepad();
+		player.Update(time);
+
+
+
+		camera.SetCameraUniforms(standardShader);
+		spec.Draw();
+
+		camera.SetCameraUniforms(rawShader);
+		triangle.Draw();
+
+		camera.SetSkyboxUniforms(skyboxShader);
 		skybox.Draw();
 		// Swap back with front buffer
 		glfwSwapBuffers(window);
 
 		// Process glfw events
 		glfwPollEvents();
-		std::cin;
 	}
 	// Delete and clean up
 	glfwDestroyWindow(window);
