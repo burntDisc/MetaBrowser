@@ -1,110 +1,35 @@
 #include "SpatialIndexer.h"
-#include <vector>
-#include <iostream>
+#include <cmath>
 
-
-SpatialIndexer::LongCoord SpatialIndexer::LongCoord::operator-(const LongCoord& coord) const
+int SpatialIndexer::GetIndex(int level, int index, int baseLength, int maxIndex)
 {
-	return
+	int levelsFromMid = (baseLength / 2) - level;
+	if (maxIndex == 0)
 	{
-		x - coord.x,
-		y - coord.y
-	};
-}
-
-long long int SpatialIndexer::LongCoord::length()
-{
-	return sqrt(x * x + y * y);
-}
-
-
-bool SpatialIndexer::CheckTriangle(SpatialIndexer::LongCoord vA, SpatialIndexer::LongCoord vB, SpatialIndexer::LongCoord vC, SpatialIndexer::LongCoord coord, long long int sideLength)
-{
-	long long int distA = (vA - coord).length();
-	long long int distB = (vB - coord).length();
-	long long int distC = (vC - coord).length();
-
-	return (distA < sideLength &&
-			distB < sideLength &&
-			distC < sideLength);
-}
-
-long long int SpatialIndexer::GetIndex(long long int sideLength, SpatialIndexer::LongCoord origin, SpatialIndexer::LongCoord coord, LongCoord reflectionFactor)
-{
-	// space filling curve type beat
-	// https://www.youtube.com/watch?v=pw_50szQfA0
-	//				  5 
-	//                /\
-	//               /  \
-	//              /  D \
-	//            2/______\4
-	//            /\      /\
-	//           /  \  B /  \
-	//          /  A \  /  C \
-	//        0/______\/______\3
-	//                1
-
-	long long int height = sideLength * sqrt(3) / 2;
-	long long int volume = sideLength * height / 2;
-
-
-	SpatialIndexer::LongCoord v0 = origin;
-
-	SpatialIndexer::LongCoord v1 = 
-	{ 
-		origin.x + sideLength / 2 * reflectionFactor.x, 
-		origin.y 
-	};
-
-	SpatialIndexer::LongCoord v2 =
+		return 0;
+	}
+	else if (level >= baseLength / 2)
 	{
-		origin.x + sideLength / 4 * reflectionFactor.x,
-		origin.y + height / 2 * reflectionFactor.y
-	};
-
-	SpatialIndexer::LongCoord v3 =
+		int adjustedLevel = level - baseLength / 2;
+		int adjustedIndex = (adjustedLevel * 2) - index;
+		return 3 * maxIndex / 4 + GetIndex(adjustedLevel, adjustedIndex, baseLength / 2, maxIndex / 4);
+	}
+	else if (index < levelsFromMid * 2 + 1)
 	{
-		origin.x + sideLength * reflectionFactor.x,
-		origin.y
-	};
-
-	SpatialIndexer::LongCoord v4 = 
+		return GetIndex(level, index, baseLength / 2, maxIndex / 4);
+	}
+	else if (index < baseLength / 2)
 	{
-		origin.x + sideLength * 3 / 4 * reflectionFactor.x,
-		origin.y + height / 2 * reflectionFactor.y
-	};
-
-	SpatialIndexer::LongCoord v5 =
+		return maxIndex / 4 + GetIndex(baseLength/2-level, index, baseLength / 2, maxIndex / 4);
+	}
+	else
 	{
-		origin.x + sideLength / 2 * reflectionFactor.x,
-		origin.y + height * reflectionFactor.y
-	};
-
-	if (CheckTriangle(v0, v1, v2, coord, sideLength / 2))
-		return
-		volume > 4 ?
-		GetIndex(sideLength / 2, origin, coord, reflectionFactor) :
-		0;
-
-	else if (CheckTriangle(v2, v4, v1, coord, sideLength / 2))
-		return
-		volume > 4 ?
-		volume / 4 + GetIndex(sideLength / 2, v2, coord, { reflectionFactor.x,-reflectionFactor.y }) :
-		1;
-
-	else if (CheckTriangle(v1, v3, v4, coord, sideLength / 2))
-		return
-		volume > 4 ?
-		volume / 2 + GetIndex(sideLength / 2, v1, coord, reflectionFactor) :
-		2;
-	else// (CheckTriangle(v4, v2, v5, coord, sideLength / 2))
-		return
-		volume > 4 ?
-		3 * volume / 4 + GetIndex(sideLength / 2, v4, coord, { -reflectionFactor.x, reflectionFactor.y }) :
-		3;
+		return maxIndex / 2 + GetIndex(level, index - baseLength / 2, baseLength / 2, maxIndex / 4);
+	}
 }
  
-long long int SpatialIndexer::IndexFromCoord(SpatialIndexer::LongCoord coord, long long int sideLength)
+int SpatialIndexer::IndexFromPosition(int level, int index, int baseLength, int iterations)
 {
-	return GetIndex(sideLength, { 0,0 }, coord, { 1,1 });
+	int maxIndex = pow(4, iterations);
+	return GetIndex(level, index, baseLength, maxIndex);
 }

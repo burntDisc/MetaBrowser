@@ -2,27 +2,34 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <algorithm> 
 
-Triangle::Triangle(Shader shader) : Drawable(shader)
+Triangle::Triangle(Shader shader, glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, float colorFac, glm::vec3 normal) : Drawable(shader)
 {
 	indices.push_back(1);
 	indices.push_back(0);
 	indices.push_back(2);
 
+
+	glm::vec3 color;
+	color.x = std::min(1.0f, colorFac * 3);
+	color.y = std::min(1.0f, colorFac * 2);
+	color.z = colorFac;
+
 	vertices.push_back({
-		glm::vec3(-1500.0f, -500.0f, -1500.0f),
-		glm::vec3(0.0f, 1.0f, 0.0f),
-		glm::vec3(1.0f, 0.0f, 0.0f)
+		v0,
+		normal,
+		color
 		});
 	vertices.push_back({
-		glm::vec3(-1500.0f, -500.0f, 1500.0f),
-		glm::vec3(0.0f, 1.0f, 0.0f),
-		glm::vec3(0.0f, 1.0f, 0.0f)
+		v1,
+		normal,
+		color
 		});
 	vertices.push_back({
-		glm::vec3(2000.0f, -500.0f, 0.0f),
-		glm::vec3(0.0f, 1.0f, 0.0f),
-		glm::vec3(0.0f, 0.0f, 1.0f)
+		v2,
+		normal,
+		color
 		});
 
 	VAO.Bind();
@@ -38,6 +45,7 @@ Triangle::Triangle(Shader shader) : Drawable(shader)
 	VAO.Unbind();
 	VBO.Unbind();
 	EBO.Unbind();
+
 }
 
 void Triangle::Draw()

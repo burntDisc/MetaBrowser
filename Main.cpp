@@ -9,7 +9,7 @@
 #include "InputHandler.h"
 #include "GameObject.h"
 #include "MotionHandler.h"
-#include "Triangle.h"
+#include "Grid.h"
 
 // TODO update filesystem include here------on;ly used for finding parentdir----------------
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
@@ -97,8 +97,8 @@ int main()
 
 	// create Triangle----------------------------------------------------------------------
 	Shader rawShader("shaders/raw.vert", "shaders/raw.frag");
-	Triangle triangle(rawShader);
-	MotionHandler::AddSolidObject(&triangle);
+	Grid grid(rawShader, 3000, 4);
+	MotionHandler::AddSolidObject(&grid);
 
 	// create player----------------------------------------------------------------------
 	Player player(glm::vec3(3.0f, 1000.0f, 10.0f));
@@ -128,7 +128,7 @@ int main()
 		spec.Draw();
 
 		camera.SetCameraUniforms(rawShader);
-		triangle.Draw();
+		grid.Draw();
 
 		camera.SetSkyboxUniforms(skyboxShader);
 		skybox.Draw();
