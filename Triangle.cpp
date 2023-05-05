@@ -12,9 +12,9 @@ Triangle::Triangle(Shader shader, glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, floa
 
 
 	glm::vec3 color;
-	color.x = std::min(1.0f, colorFac * 3);
-	color.y = std::min(1.0f, colorFac * 2);
-	color.z = colorFac;
+	color.x = colorFac;
+	color.y = colorFac;
+	color.z = colorFac;;
 
 	vertices.push_back({
 		v0,

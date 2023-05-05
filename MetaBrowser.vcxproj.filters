@@ -78,6 +78,9 @@
     <ClCompile Include="Grid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Text.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Skybox.h">
@@ -140,6 +143,9 @@
     <ClInclude Include="Grid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Text.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\skybox.frag">
@@ -158,6 +164,12 @@
       <Filter>Resource Files\shaders</Filter>
     </None>
     <None Include="shaders\raw.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="shaders\text.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="shaders\text.vert">
       <Filter>Resource Files\shaders</Filter>
     </None>
   </ItemGroup>

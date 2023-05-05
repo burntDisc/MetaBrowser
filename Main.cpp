@@ -1,3 +1,4 @@
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -11,14 +12,20 @@
 #include "MotionHandler.h"
 #include "Grid.h"
 
-// TODO update filesystem include here------on;ly used for finding parentdir----------------
+#include "Text.h"
+
+#include <ft2build.h>
+#include FT_FREETYPE_H  
+
+// TODO update filesystem include here------only used for finding parentdir----
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
-//----------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 int main()
 {
+
 	// Set up window-----------------------------------------------------------
 	// initilize glfw to handle input and window
 	glfwInit();
@@ -100,6 +107,9 @@ int main()
 	Grid grid(rawShader, 3000, 4);
 	MotionHandler::AddSolidObject(&grid);
 
+	// create Text
+	Shader textShader("shaders/text.vert", "shaders/text.frag");
+	Text text(textShader);
 	// create player----------------------------------------------------------------------
 	Player player(glm::vec3(3.0f, 1000.0f, 10.0f));
 
@@ -132,6 +142,9 @@ int main()
 
 		camera.SetSkyboxUniforms(skyboxShader);
 		skybox.Draw();
+
+		//camera.SetSkyboxUniforms(textShader);
+		text.RenderText(textShader, "This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
 		// Swap back with front buffer
 		glfwSwapBuffers(window);
 
