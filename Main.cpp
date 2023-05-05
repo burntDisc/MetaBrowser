@@ -109,7 +109,10 @@ int main()
 
 	// create Text
 	Shader textShader("shaders/text.vert", "shaders/text.frag");
-	Text text(textShader);
+	glm::vec3 textTranslation(0.0f, 0.0f, 0.0f);
+	glm::quat textRotation = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::vec3 textScale(1.0f, 1.0f, 1.0f);
+	Text text(textShader, textTranslation, textRotation, textScale);
 	// create player----------------------------------------------------------------------
 	Player player(glm::vec3(3.0f, 1000.0f, 10.0f));
 
@@ -134,17 +137,17 @@ int main()
 
 
 
-		camera.SetCameraUniforms(standardShader);
-		spec.Draw();
+		//camera.SetCameraUniforms(standardShader);
+		//spec.Draw();
 
 		camera.SetCameraUniforms(rawShader);
 		grid.Draw();
 
-		camera.SetSkyboxUniforms(skyboxShader);
-		skybox.Draw();
+		//camera.SetSkyboxUniforms(skyboxShader);
+		//skybox.Draw();
 
-		//camera.SetSkyboxUniforms(textShader);
-		text.RenderText(textShader, "This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
+		camera.SetCameraUniforms(textShader);
+		text.RenderText(textShader, "This is sample text", 0.25f, 0.25f, 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 		// Swap back with front buffer
 		glfwSwapBuffers(window);
 

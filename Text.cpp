@@ -11,12 +11,26 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-Text::Text(Shader shader)
+Text::Text(Shader shader, glm::vec3 translation, glm::quat rotation, glm::vec3 scale)
 {
 
     glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(SCR_WIDTH), 0.0f, static_cast<float>(SCR_HEIGHT));
     shader.Activate();
     glUniformMatrix4fv(glGetUniformLocation(shader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+    glm::mat4 translationMatrix = glm::mat4(1.0f);
+    glm::mat4 rotationMatrix = glm::mat4(1.0f);
+    glm::mat4 scaleMatrix = glm::mat4(1.0f);
+
+    translationMatrix = glm::translate(translationMatrix, translation);
+    rotationMatrix = glm::mat4_cast(rotation);
+    scaleMatrix = glm::scale(scaleMatrix, scale);
+
+    // set position uniforms in shader
+    glUniformMatrix4fv(glGetUniformLocation(shader.ID, "translation"), 1, GL_FALSE, glm::value_ptr(translationMatrix));
+    glUniformMatrix4fv(glGetUniformLocation(shader.ID, "rotation"), 1, GL_FALSE, glm::value_ptr(rotationMatrix));
+    glUniformMatrix4fv(glGetUniformLocation(shader.ID, "scale"), 1, GL_FALSE, glm::value_ptr(scaleMatrix));
+
 
     // FreeType
     // --------

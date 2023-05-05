@@ -24,7 +24,7 @@ private:
 
     unsigned int VAO, VBO;
 public:
-	Text(Shader shader);
+	Text(Shader shader, glm::vec3 translation, glm::quat rotation, glm::vec3 scale);
     void RenderText(Shader& shader, std::string text, float x, float y, float scale, glm::vec3 color);
 
 };
