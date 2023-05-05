@@ -172,5 +172,8 @@
     <None Include="shaders\text.vert">
       <Filter>Resource Files\shaders</Filter>
     </None>
+    <None Include="shaders\textOverlay.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

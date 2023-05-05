@@ -197,6 +197,7 @@
     <None Include="shaders\standard.vert" />
     <None Include="shaders\text.frag" />
     <None Include="shaders\text.vert" />
+    <None Include="shaders\textOverlay.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
