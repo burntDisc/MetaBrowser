@@ -145,14 +145,12 @@
   <ItemGroup>
     <ClCompile Include="..\05t4r\libraries\include\glad\glad.c" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Drawable.cpp" />
     <ClCompile Include="ElementBufferObject.cpp" />
     <ClCompile Include="FileLoader.cpp" />
-    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="InputHandler.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="Model.cpp" />
     <ClCompile Include="MotionHandler.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SpatialIndexer.cpp" />
@@ -160,7 +158,6 @@
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="stb_image.cpp" />
     <ClCompile Include="Text.cpp" />
-    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Triangle.cpp" />
     <ClCompile Include="VertexArrayObject.cpp" />
     <ClCompile Include="VertexBufferObject.cpp" />
@@ -170,11 +167,8 @@
     <ClInclude Include="Drawable.h" />
     <ClInclude Include="ElementBufferObject.h" />
     <ClInclude Include="FileLoader.h" />
-    <ClInclude Include="GameObject.h" />
     <ClInclude Include="Grid.h" />
     <ClInclude Include="InputHandler.h" />
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="Model.h" />
     <ClInclude Include="MotionHandler.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="SolidObject.h" />
@@ -182,7 +176,6 @@
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="Text.h" />
-    <ClInclude Include="Texture.h" />
     <ClInclude Include="Updatable.h" />
     <ClInclude Include="VertexArrayObject.h" />
     <ClInclude Include="VertexBufferObject.h" />

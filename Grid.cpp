@@ -1,8 +1,8 @@
 #include "Grid.h"
 #include "SpatialIndexer.h"
 
-Grid::Grid(Shader shader, float baseLength, int iterations) :
-	Drawable(shader)
+Grid::Grid(Shader& rawShader, Shader& textShader, Camera& camera, float baseLength, int iterations, Player& player) :
+	Drawable(rawShader, camera)
 {
 	float height = -500.0f;
 	int baseNum = pow(2, iterations);
@@ -27,7 +27,7 @@ Grid::Grid(Shader shader, float baseLength, int iterations) :
 
 			int colorVal1 = SpatialIndexer::IndexFromPosition(level, i * 2, baseNum, iterations);
 			float colorFac0 = (float)colorVal1 / colorMax;
-			triangles.push_back(new Triangle(shader, vert0, vert1, vert3, colorFac0));
+			triangles.push_back(new Triangle(rawShader, textShader, camera, vert0, vert1, vert3, colorFac0, player));
 
 			if (i + 1 < baseNum - level)
 			{
@@ -35,7 +35,7 @@ Grid::Grid(Shader shader, float baseLength, int iterations) :
 				vert3 = vert1 + glm::vec3(triangleSideLength, 0.0f, 0.0f);
 				int colorVal1 = SpatialIndexer::IndexFromPosition(level, i * 2 + 1, baseNum, iterations);
 				float colorFac1 = (float)colorVal1 / colorMax;
-				triangles.push_back(new Triangle(shader, vert0, vert1, vert3, colorFac1));
+				triangles.push_back(new Triangle(rawShader, textShader, camera, vert0, vert1, vert3, colorFac1, player));
 
 				vert1 = vert3;
 			}

@@ -2,13 +2,13 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 #include <iostream>
 #include "Skybox.h"
 #include "Camera.h"
 #include "Player.h"
 #include "InputHandler.h"
-#include "GameObject.h"
 #include "MotionHandler.h"
 #include "Grid.h"
 
@@ -25,7 +25,6 @@ namespace fs = std::experimental::filesystem;
 
 int main()
 {
-
 	// Set up window-----------------------------------------------------------
 	// initilize glfw to handle input and window
 	glfwInit();
@@ -71,48 +70,20 @@ int main()
 	//glCullFace(GL_FRONT);
 	// Uses counter clock-wise standard
 	//glFrontFace(GL_CCW);
-	// 
+	
+
+
+	// Shaders---------------------------------------------------------------------------
+
+	Shader skyboxShader("shaders/skybox.vert", "shaders/skybox.frag");
+	Shader textShader("shaders/text.vert", "shaders/text.frag");
+	Shader rawShader("shaders/raw.vert", "shaders/raw.frag");
 	
 	// Create SkyBox---------------------------------------------------------------------
-	Shader skyboxShader("shaders/skybox.vert", "shaders/skybox.frag");
 	std::string parentDir = fs::current_path().string();
 	std::string skyboxFacesDirectory = parentDir + "/models/skybox/";
 	Skybox skybox(skyboxShader, skyboxFacesDirectory);
 
-	// Create Object---------------------------------------------------------------------
-	Shader standardShader("shaders/standard.vert", "shaders/standard.frag");
-	standardShader.Activate();
-	glm::vec4 lightColor = glm::vec4(1.2f, 1.2f, 1.2f, 1.2f);
-	glm::vec3 lightPos = glm::vec3(20.0f, 20.0f, 20.0f);
-	glUniform4f(glGetUniformLocation(standardShader.ID, "lightColor"),
-		lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-	glUniform3f(glGetUniformLocation(standardShader.ID, "lightPos"),
-		lightPos.x, lightPos.y, lightPos.z);
-
-	std::string specPath = parentDir + "/models/errorplane/scene.gltf";
-	glm::vec3 specTranslation(0.0f, -500.0f, 0.0f);
-	glm::quat specRotation = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::vec3 specScale(100.0f, 100.0f, 100.0f);
-	GameObject spec(
-		standardShader,
-		specPath.c_str(),
-		specTranslation,
-		specScale,
-		specRotation
-	);
-	MotionHandler::AddSolidObject(&spec);
-
-	// create Triangle----------------------------------------------------------------------
-	Shader rawShader("shaders/raw.vert", "shaders/raw.frag");
-	Grid grid(rawShader, 3000, 4);
-	MotionHandler::AddSolidObject(&grid);
-
-	// create Text
-	Shader textShader("shaders/text.vert", "shaders/text.frag");
-	glm::vec3 textTranslation(0.0f, 0.0f, 0.0f);
-	glm::quat textRotation = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::vec3 textScale(1.0f, 1.0f, 1.0f);
-	Text text(textShader, textTranslation, textRotation, textScale);
 	// create player----------------------------------------------------------------------
 	Player player(glm::vec3(3.0f, 1000.0f, 10.0f));
 
@@ -121,6 +92,19 @@ int main()
 	Camera camera(width, height);
 	camera.Bind(&player.translation, &player.orientation, &FOV);
 	camera.SetSkyboxUniforms(skyboxShader);
+
+	// create Text
+	glm::vec3 textTranslation1(100.0f, 100.0f, 100.0f);
+	glm::quat textRotation = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::vec3 textScale(1.0f, 1.0f, 1.0f);
+	Text text1(textShader, textTranslation1, textRotation, textScale, player);
+
+	glm::vec3 textTranslation0(-100.0f, 100.0f, 100.0f);
+	Text text0(textShader, textTranslation0, textRotation, textScale, player);
+
+	// create Triangle grid----------------------------------------------------------------------
+	Grid grid(rawShader, textShader, camera, 3000, 2, player);
+	MotionHandler::AddSolidObject(&grid);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -135,19 +119,15 @@ int main()
 		InputHandler::UpdateGamepad();
 		player.Update(time);
 
-
-
-		//camera.SetCameraUniforms(standardShader);
-		//spec.Draw();
-
-		camera.SetCameraUniforms(rawShader);
 		grid.Draw();
 
 		//camera.SetSkyboxUniforms(skyboxShader);
 		//skybox.Draw();
-
 		camera.SetCameraUniforms(textShader);
-		text.RenderText(textShader, "This is sample text", 0.25f, 0.25f, 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+		text1.RenderText(textShader, "one is the zero", 0.0f, 0.0f, 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+
+		text0.RenderText(textShader, "2 is the one", 0.0f, 0.0f, 1.0f, glm::vec3(1.0f, 1.0f, 0.0f));
+
 		// Swap back with front buffer
 		glfwSwapBuffers(window);
 

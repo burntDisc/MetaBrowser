@@ -1,13 +1,15 @@
 #pragma once
 #include "Shader.h"
+#include "Camera.h"
 
 class Drawable
 {
 public:
-	Drawable(Shader shader) : shader(shader) {};
-	virtual void Draw() = 0;
+	Drawable(Shader& shader, Camera& camera) : shader(shader), camera(camera){};
+	void Draw();
 
 protected:
-	Shader shader;
+	Shader& shader;
+	Camera& camera;
 };
 

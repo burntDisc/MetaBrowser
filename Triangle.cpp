@@ -4,8 +4,18 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <algorithm> 
 
-Triangle::Triangle(Shader shader, glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, float colorFac, glm::vec3 normal) : Drawable(shader)
+Triangle::Triangle(Shader& rawShader, Shader& textShader, Camera& camera, glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, float colorFac, Player& player, glm::vec3 normal) :
+	textShader(textShader),
+	Drawable(rawShader, camera)
 {
+
+	glm::vec3 textOrigin = (v0 + v1 + v2) / 3.0f + glm::vec3(0.0f, 10.0f, 0.0f);
+	//create Text
+	glm::quat textRotation = glm::vec3(1.0f, 0.0f, 0.0f);
+	glm::vec3 textScale(1.0f, 1.0f, 1.0f);
+	text = new Text(textShader, textOrigin, textRotation, textScale, player);
+
+
 	indices.push_back(1);
 	indices.push_back(0);
 	indices.push_back(2);
@@ -48,8 +58,15 @@ Triangle::Triangle(Shader shader, glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, floa
 
 }
 
+Triangle::~Triangle()
+{
+	delete text;
+}
+
 void Triangle::Draw()
 {
+	Drawable::Draw();
+	text->RenderText(textShader, "This is sample text", 0.0f, 0.0f, 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 	// Bind shader to be set uniforms
 	shader.Activate();
 	VAO.Bind();

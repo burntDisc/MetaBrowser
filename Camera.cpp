@@ -32,7 +32,6 @@ void Camera::SetCameraUniforms(Shader& shader)
 	projection = glm::perspective(glm::radians(*feildOfView), aspectRatio, nearPlane, farPlane);
 
 	shader.Activate();
-	glUniform3f(glGetUniformLocation(shader.ID, "camPos"), translation->x, translation->y, translation->z);
 	glUniformMatrix4fv(glGetUniformLocation(shader.ID, "view"), 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(glGetUniformLocation(shader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 }

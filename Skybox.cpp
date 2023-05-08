@@ -5,7 +5,7 @@
 #include <iostream>
 
 Skybox::Skybox(Shader shader, std::string facesDirectory) :
-	Drawable(shader),
+	Drawable(shader, camera),
 	skyboxVertices{
 		//   Coordinates
 		  -1.0f,-1.0f, 1.0f,//        7--------6
@@ -111,7 +111,7 @@ Skybox::Skybox(Shader shader, std::string facesDirectory) :
 // Draw skybox last to optimize fragment pass
 void Skybox::Draw()
 {
-
+	camera.SetSkyboxUniforms(shader);
 	// Setup and Draw skybox--------------------------
 	// set constant depth for skybox
 	shader.Activate();

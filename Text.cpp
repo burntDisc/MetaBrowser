@@ -11,25 +11,19 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-Text::Text(Shader shader, glm::vec3 translation, glm::quat rotation, glm::vec3 scale)
+Text::Text(Shader shader, glm::vec3 translation, glm::quat rotation, glm::vec3 scale, Player& player) :
+    translation(translation),
+    translationMatrix(1.0f),
+    scaleMatrix(1.0f),
+    player(player)
 {
 
-    glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(SCR_WIDTH), 0.0f, static_cast<float>(SCR_HEIGHT));
-    shader.Activate();
-    glUniformMatrix4fv(glGetUniformLocation(shader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+   // glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(SCR_WIDTH), 0.0f, static_cast<float>(SCR_HEIGHT));
+   // glUniformMatrix4fv(glGetUniformLocation(shader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
-    glm::mat4 translationMatrix = glm::mat4(1.0f);
-    glm::mat4 rotationMatrix = glm::mat4(1.0f);
-    glm::mat4 scaleMatrix = glm::mat4(1.0f);
 
     translationMatrix = glm::translate(translationMatrix, translation);
-    rotationMatrix = glm::mat4_cast(rotation);
     scaleMatrix = glm::scale(scaleMatrix, scale);
-
-    // set position uniforms in shader
-    glUniformMatrix4fv(glGetUniformLocation(shader.ID, "translation"), 1, GL_FALSE, glm::value_ptr(translationMatrix));
-    glUniformMatrix4fv(glGetUniformLocation(shader.ID, "rotation"), 1, GL_FALSE, glm::value_ptr(rotationMatrix));
-    glUniformMatrix4fv(glGetUniformLocation(shader.ID, "scale"), 1, GL_FALSE, glm::value_ptr(scaleMatrix));
 
 
     // FreeType
@@ -113,12 +107,74 @@ Text::Text(Shader shader, glm::vec3 translation, glm::quat rotation, glm::vec3 s
     glBindVertexArray(0);
 }
 
+
+glm::quat Text::OrientationToRotation(glm::vec3 orientation)
+{
+    glm::vec3 up(0.0f, 1.0f, 0.0f);
+
+    glm::vec3 interim0 = glm::cross(up, orientation);
+
+    glm::vec3 interim1 = glm::cross(orientation, interim0);
+    float m00 = interim0.x;
+    float m01 = interim0.y;
+    float m02 = interim0.z;
+    float m10 = interim1.x;
+    float m11 = interim1.y;
+    float m12 = interim1.z;
+    float m20 = orientation.x;
+    float m21 = orientation.y;
+    float m22 = orientation.z;
+
+    double num8 = (m00 + m11) + m22;
+    glm::quat quaternion;
+    if (num8 > 0.0)
+    {
+        float num = (float)sqrt(num8 + 1.0);
+        quaternion.w = (num * 0.5f);
+        num = 0.5f / num;
+        quaternion.x = (m12 - m21) * num;
+        quaternion.y = (m20 - m02) * num;
+        quaternion.z = (m01 - m10) * num;
+        return quaternion;
+    }
+    if ((m00 >= m11) && (m00 >= m22))
+    {
+        float num7 = (float)sqrt(((1.0 + m00) - m11) - m22);
+        float num4 = 0.5f / num7;
+        quaternion.x = 0.5f * num7;
+        quaternion.y = (m01 + m10) * num4;
+        quaternion.z = (m02 + m20) * num4;
+        quaternion.w = (m12 - m21) * num4;
+        return quaternion;
+    }
+    if (m11 > m22)
+    {
+        float num6 = (float)sqrt(((1.0 + m11) - m00) - m22);
+        float num3 = 0.5f / num6;
+        quaternion.x = (m10 + m01) * num3;
+        quaternion.y = 0.5f * num6;
+        quaternion.z = (m21 + m12) * num3;
+        quaternion.w = (m20 - m02) * num3;
+        return quaternion;
+    }
+    float num5 = (float)sqrt(((1.0 + m22) - m00) - m11);
+    float num2 = 0.5f / num5;
+    quaternion.x = (m20 + m02) * num2;
+    quaternion.y = (m21 + m12) * num2;
+    quaternion.z = 0.5f * num5;
+    quaternion.w = (m01 - m10) * num2;
+    return quaternion;
+}
+
+
 // render line of text
 // -------------------
-void Text::RenderText(Shader& shader, std::string text, float x, float y, float scale, glm::vec3 color)
+void Text::RenderText(Shader& shader, std::string text, float x, float y, float size, glm::vec3 color)
 {
     // activate corresponding render state	
     shader.Activate();
+
+    float xOffset = 0.0f;
     glUniform3f(glGetUniformLocation(shader.ID, "textColor"), color.x, color.y, color.z);
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);
@@ -129,11 +185,11 @@ void Text::RenderText(Shader& shader, std::string text, float x, float y, float 
     {
         Character ch = Characters[*c];
 
-        float xpos = x + ch.Bearing.x * scale;
-        float ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
+        float xpos = xOffset + ch.Bearing.x * size;
+        float ypos = - (ch.Size.y - ch.Bearing.y) * size;
 
-        float w = ch.Size.x * scale;
-        float h = ch.Size.y * scale;
+        float w = ch.Size.x * size;
+        float h = ch.Size.y * size;
         // update VBO for each character
         float vertices[6][4] = {
             { xpos,     ypos + h,   0.0f, 0.0f },
@@ -152,9 +208,21 @@ void Text::RenderText(Shader& shader, std::string text, float x, float y, float 
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         // render quad
+        glm::mat4 rotationMatrix = glm::mat4(1.0f);
+        glm::vec3 orientation = normalize(player.translation - translation);// -glm::vec3(0.0f, xOffset + ch.Size.x / 2, 0.0f));
+        glm::quat rotation = OrientationToRotation(orientation);
+        rotationMatrix = glm::mat4_cast(rotation);
+        
+        // set position uniforms in shader
+        glUniformMatrix4fv(glGetUniformLocation(shader.ID, "translation"), 1, GL_FALSE, glm::value_ptr(translationMatrix));
+        glUniformMatrix4fv(glGetUniformLocation(shader.ID, "scale"), 1, GL_FALSE, glm::value_ptr(scaleMatrix));
+        glUniformMatrix4fv(glGetUniformLocation(shader.ID, "rotation"), 1, GL_FALSE, glm::value_ptr(rotationMatrix));
+
+        glUniformMatrix4fv(glGetUniformLocation(shader.ID, "rotation"), 1, GL_FALSE, glm::value_ptr(rotationMatrix));
+
         glDrawArrays(GL_TRIANGLES, 0, 6);
         // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
-        x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))
+        xOffset += (ch.Advance >> 6) * size; // bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))
     }
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
