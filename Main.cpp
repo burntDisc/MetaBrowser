@@ -89,8 +89,7 @@ int main()
 
 	//create camera-----------------------------------------------------------------------
 	float FOV = 45.0f;
-	Camera camera(width, height);
-	camera.Bind(&player.translation, &player.orientation, &FOV);
+	Camera camera(width, height, player.translation, player.orientation, FOV);
 	camera.SetSkyboxUniforms(skyboxShader);
 
 	// create Text
