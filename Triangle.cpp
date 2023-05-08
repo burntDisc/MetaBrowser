@@ -13,8 +13,8 @@ Triangle::Triangle(Shader& rawShader, Shader& textShader, Camera& camera, glm::v
 	//create Text
 	glm::quat textRotation = glm::vec3(1.0f, 0.0f, 0.0f);
 	glm::vec3 textScale(1.0f, 1.0f, 1.0f);
-	// TODO unique_pointers
-	text = new Text(textShader, label, "arial.ttf", textOrigin, textRotation, textScale, player);
+
+	text = make_unique<Text>(textShader, label, "arial.ttf", textOrigin, textRotation, textScale, player);
 
 
 	indices.push_back(1);
@@ -57,11 +57,6 @@ Triangle::Triangle(Shader& rawShader, Shader& textShader, Camera& camera, glm::v
 	VBO.Unbind();
 	EBO.Unbind();
 
-}
-
-Triangle::~Triangle()
-{
-	delete text;
 }
 
 void Triangle::Draw()
