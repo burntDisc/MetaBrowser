@@ -11,7 +11,8 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-Text::Text(Shader shader, glm::vec3 translation, glm::quat rotation, glm::vec3 scale, Player& player) :
+Text::Text(Shader shader, std::string text, std::string fontFile, glm::vec3 translation, glm::quat rotation, glm::vec3 scale, Player& player) :
+    text(text),
     translation(translation),
     translationMatrix(1.0f),
     scaleMatrix(1.0f),
@@ -38,7 +39,7 @@ Text::Text(Shader shader, glm::vec3 translation, glm::quat rotation, glm::vec3 s
 
     // load font as face
     FT_Face face;
-    if (FT_New_Face(ft, "arial.ttf", 0, &face)) {
+    if (FT_New_Face(ft, fontFile.c_str(), 0, &face)) {
         std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
         exit(1);
     }
@@ -169,7 +170,7 @@ glm::quat Text::OrientationToRotation(glm::vec3 orientation)
 
 // render line of text
 // -------------------
-void Text::RenderText(Shader& shader, std::string text, float x, float y, float size, glm::vec3 color)
+void Text::RenderText(Shader& shader, float x, float y, float size, glm::vec3 color)
 {
     // activate corresponding render state	
     shader.Activate();

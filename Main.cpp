@@ -97,10 +97,10 @@ int main()
 	glm::vec3 textTranslation1(100.0f, 100.0f, 100.0f);
 	glm::quat textRotation = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 textScale(1.0f, 1.0f, 1.0f);
-	Text text1(textShader, textTranslation1, textRotation, textScale, player);
+	Text text1(textShader, "two is the one", "arial.ttf", textTranslation1, textRotation, textScale, player);
 
 	glm::vec3 textTranslation0(-100.0f, 100.0f, 100.0f);
-	Text text0(textShader, textTranslation0, textRotation, textScale, player);
+	Text text0(textShader, "one is the zero", "arial.ttf", textTranslation0, textRotation, textScale, player);
 
 	// create Triangle grid----------------------------------------------------------------------
 	Grid grid(rawShader, textShader, camera, 3000, 2, player);
@@ -124,9 +124,9 @@ int main()
 		//camera.SetSkyboxUniforms(skyboxShader);
 		//skybox.Draw();
 		camera.SetCameraUniforms(textShader);
-		text1.RenderText(textShader, "one is the zero", 0.0f, 0.0f, 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+		text1.RenderText(textShader,  0.0f, 0.0f, 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 
-		text0.RenderText(textShader, "2 is the one", 0.0f, 0.0f, 1.0f, glm::vec3(1.0f, 1.0f, 0.0f));
+		text0.RenderText(textShader, 0.0f, 0.0f, 1.0f, glm::vec3(1.0f, 1.0f, 0.0f));
 
 		// Swap back with front buffer
 		glfwSwapBuffers(window);

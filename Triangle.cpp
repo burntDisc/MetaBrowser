@@ -4,7 +4,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <algorithm> 
 
-Triangle::Triangle(Shader& rawShader, Shader& textShader, Camera& camera, glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, float colorFac, Player& player, glm::vec3 normal) :
+Triangle::Triangle(Shader& rawShader, Shader& textShader, Camera& camera, glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, float colorFac, Player& player, std::string label, glm::vec3 normal) :
 	textShader(textShader),
 	Drawable(rawShader, camera)
 {
@@ -13,7 +13,7 @@ Triangle::Triangle(Shader& rawShader, Shader& textShader, Camera& camera, glm::v
 	//create Text
 	glm::quat textRotation = glm::vec3(1.0f, 0.0f, 0.0f);
 	glm::vec3 textScale(1.0f, 1.0f, 1.0f);
-	text = new Text(textShader, textOrigin, textRotation, textScale, player);
+	text = new Text(textShader, label, "arial.ttf", textOrigin, textRotation, textScale, player);
 
 
 	indices.push_back(1);
@@ -66,7 +66,7 @@ Triangle::~Triangle()
 void Triangle::Draw()
 {
 	Drawable::Draw();
-	text->RenderText(textShader, "This is sample text", 0.0f, 0.0f, 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+	text->RenderText(textShader, 0.0f, 0.0f, 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 	// Bind shader to be set uniforms
 	shader.Activate();
 	VAO.Bind();

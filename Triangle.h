@@ -14,7 +14,7 @@ class Triangle :
 	public SolidObject
 {
 public:
-	Triangle(Shader& rawShader, Shader& textShader, Camera& camera, glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, float colorFac, Player& player, glm::vec3 normal = glm::vec3(0.0f, 1.0f, 0.0f));
+	Triangle(Shader& rawShader, Shader& textShader, Camera& camera, glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, float colorFac, Player& player, std::string label, glm::vec3 normal = glm::vec3(0.0f, 1.0f, 0.0f));
 	~Triangle();
 	void Draw();
 	std::vector<glm::vec3> GetTriangleWorldPositions();
