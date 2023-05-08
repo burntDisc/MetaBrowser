@@ -103,7 +103,7 @@ int main()
 	Text text0(textShader, "one is the zero", "arial.ttf", textTranslation0, textRotation, textScale, player);
 
 	// create Triangle grid----------------------------------------------------------------------
-	Grid grid(rawShader, textShader, camera, 3000, 2, player);
+	Grid grid(rawShader, textShader, camera, 3000, 4, player);
 	MotionHandler::AddSolidObject(&grid);
 
 	while (!glfwWindowShouldClose(window))

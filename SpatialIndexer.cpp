@@ -12,20 +12,22 @@ int SpatialIndexer::GetIndex(int level, int index, int baseLength, int maxIndex)
 	{
 		//top flipped horizontal
 		int adjustedLevel = level - baseLength / 2;
-		int adjustedIndex = (adjustedLevel * 2) - index;
-		return 3 * (maxIndex + 1) / 4 + GetIndex(adjustedLevel, adjustedIndex, baseLength / 2, maxIndex / 4);
+		int adjustedIndex = (baseLength/2 - 1) * 2 - index;
+		return 3 * (maxIndex + 1) / 4 + GetIndex(level - baseLength / 2, adjustedIndex, baseLength / 2, maxIndex / 4);
 	}
 	else if (index < levelsFromMid * 2 + 1)
-	{ // left
+	{ 
+		// left
 		return GetIndex(level, index, baseLength / 2, maxIndex / 4);
 	}
 	else if (index < baseLength)
 	{
 		//middle flipped vertical
-		return (maxIndex + 1) / 4 + GetIndex(baseLength/2-level, index, baseLength / 2, maxIndex / 4);
+		return (maxIndex + 1) / 4 + GetIndex(levelsFromMid, index - levelsFromMid * 2 - 1, baseLength / 2, maxIndex / 4);
 	}
 	else
-	{ // right
+	{ 
+		// right
 		return (maxIndex + 1) / 2 + GetIndex(level, index - baseLength, baseLength / 2, maxIndex / 4);
 	}
 }
