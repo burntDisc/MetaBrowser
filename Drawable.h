@@ -9,6 +9,7 @@ public:
 	void Draw();
 
 protected:
+	//TODO: unsigned int VBO, VAO or VBO/VAO class;
 	Shader& shader;
 	Camera& camera;
 };

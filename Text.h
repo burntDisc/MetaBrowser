@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include <map>
 
+#include <vector>
 #include "Player.h"
 
 class Text
@@ -29,7 +30,8 @@ private:
         unsigned int Advance;   // Horizontal offset to advance to next glyph
     };
 
-    std::map<GLchar, Character> Characters;
+    static std::vector<std::string> loadedFonts;
+    static std::map<GLchar, Character> Characters;
 
     unsigned int VAO, VBO;
 public:
