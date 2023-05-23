@@ -14,7 +14,7 @@ Triangle::Triangle(Shader& rawShader, Shader& textShader, Camera& camera, glm::v
 	glm::quat textRotation = glm::vec3(1.0f, 0.0f, 0.0f);
 	glm::vec3 textScale(1.0f, 1.0f, 1.0f);
 
-	text = make_unique<Text>(textShader, label, "arial.ttf", textOrigin, textRotation, textScale, player);
+	text = std::make_unique<Text>(textShader, label, textOrigin, textRotation, textScale, player);
 
 
 	indices.push_back(1);
@@ -44,10 +44,8 @@ Triangle::Triangle(Shader& rawShader, Shader& textShader, Camera& camera, glm::v
 		});
 
 	VAO.Bind();
-	VertexBufferObject VBO;
 	VBO.Update(vertices);
 	// Generates Element Buffer Object and links it to indices
-	ElementBufferObject EBO;
 	EBO.Update(indices);
 	// Links VertexBufferObject attributes such as coordinates and colors to VertexArrayObject
 	VAO.LinkAttrib(VBO, 0, 3, GL_FLOAT, sizeof(VertexRaw), (void*)0);
@@ -57,6 +55,13 @@ Triangle::Triangle(Shader& rawShader, Shader& textShader, Camera& camera, glm::v
 	VBO.Unbind();
 	EBO.Unbind();
 
+}
+
+Triangle::~Triangle()
+{
+	VAO.Delete();
+	VBO.Delete();
+	EBO.Delete();
 }
 
 void Triangle::Draw()

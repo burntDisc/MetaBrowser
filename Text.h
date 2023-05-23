@@ -32,10 +32,10 @@ private:
 
     static std::vector<std::string> loadedFonts;
     static std::map<GLchar, Character> Characters;
-
-    unsigned int VAO, VBO;
+    static unsigned int VAO, VBO;
 public:
-	Text(Shader shader, std::string text, std::string fontFile, glm::vec3 translation, glm::quat rotation, glm::vec3 scale, Player& player);
+    static void LoadFont(std::string fontFile);
+	Text(Shader shader, std::string text, glm::vec3 translation, glm::quat rotation, glm::vec3 scale, Player& player);
     void RenderText(Shader& shader, float x, float y, float size, glm::vec3 color);
 
 };

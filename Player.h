@@ -76,7 +76,7 @@ private:
 	const float dashAcceleration = 5000.00f;
 	const float dashInitVelocity = 175.0f;
 	const float maxSpeed = 175.0f; // for acceleraton only
-	const float gravity = 000.0f;
+	const float gravity = 100.0f;
 	const float repulsionFac = 1.2;
 
 	const float lookSensitivity = 200.0f;

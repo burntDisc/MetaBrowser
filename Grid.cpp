@@ -1,54 +1,156 @@
 #include "Grid.h"
 #include "SpatialIndexer.h"
+#include <memory>
 
-Grid::Grid(Shader& rawShader, Shader& textShader, Camera& camera, float baseLength, int iterations, Player& player) :
-	Drawable(rawShader, camera)
+Grid::Grid(Shader& rawShader, Shader& textShader, Camera& camera, float unitWidth, int iterations, Player& player) :
+	Drawable(rawShader, camera),
+	textShader(textShader),
+	player(player),
+	unitWidth(unitWidth),
+	iterations(iterations)
 {
-	float height = -500.0f;
-	int baseNum = pow(2, iterations);
-	float colorMax = pow(4, iterations);
-	float triangleSideLength = baseLength / baseNum;
-	float triangleHeight = triangleSideLength * sqrt(3) / 2.0f;
-
-
-	glm::vec3 vert0Init(0.0f, height, 0.0f);
-	glm::vec3 vert1Init(triangleSideLength / 2, height, triangleHeight);
-
-	glm::vec3 levelAdjustment(triangleSideLength / 2.0f, 0.0f, triangleHeight);
-
-	for (int level = 0; level < baseNum; ++level)
-	{
-		glm::vec3 vert0 = vert0Init + levelAdjustment * (float)level;
-		glm::vec3 vert1 = vert1Init + levelAdjustment * (float)level;
-
-		for (int i = 0; i < baseNum - level; ++i)
-		{
-			glm::vec3 vert3 = vert0 + glm::vec3(triangleSideLength, 0.0f, 0.0f);
-
-			int colorVal0 = SpatialIndexer::IndexFromPosition(level, i * 2, baseNum, iterations);
-			float colorFac0 = (float)colorVal0 / colorMax;
-			triangles.push_back(new Triangle(rawShader, textShader, camera, vert0, vert1, vert3, colorFac0, player, std::to_string(colorVal0)));
-
-			if (i + 1 < baseNum - level)
-			{
-				vert0 = vert3;
-				vert3 = vert1 + glm::vec3(triangleSideLength, 0.0f, 0.0f);
-				int colorVal1 = SpatialIndexer::IndexFromPosition(level, i * 2 + 1, baseNum, iterations);
-				float colorFac1 = (float)colorVal1 / colorMax;
-				triangles.push_back(new Triangle(rawShader, textShader, camera, vert0, vert1, vert3, colorFac1, player, std::to_string(colorVal1)));
-
-				vert1 = vert3;
-			}
-		}
-
-	}
+	sideUnits = pow(2, iterations);
+	unitLength = unitWidth * sqrt(3) / 2.0f;
+	
+	FillTriangles();
 }
 
-Grid::~Grid()
+void Grid::TestTriangles()
 {
-	for (int i = 0; i < triangles.size(); ++i)
+	triangles.clear();
+	glm::vec3 v0 = glm::vec3(-500.0f, -height, -500.0f) + player.translation;
+	glm::vec3 v1 = glm::vec3(500.0f, -height, -500.0f) + player.translation;
+	glm::vec3 v2 = glm::vec3(0.0f, -height, 200.0f) + player.translation;
+	triangles.push_back(
+		std::make_unique<Triangle>(shader, textShader, camera, v0, v1, v2, 0.1f, player, "0"));
+}
+
+void Grid::FillTriangles()
+{
+	triangles.clear();
+
+	//Box center coord
+	//
+	//		      .___.  high,high
+    //           /	 /
+	//	low,low .___.
+	//
+	//
+	//
+
+	int lowRoundedLevel = (int) (player.translation.z / unitLength);
+	float lowZ = lowRoundedLevel * unitLength;
+	float highZ = (lowRoundedLevel + 1) * unitLength;
+
+	
+	int lowRoundedIndex = (int)((player.translation.x - lowRoundedLevel * unitWidth / 2.0f) / unitWidth);
+	float lowX = lowRoundedIndex * unitWidth;
+	float highX = (lowRoundedIndex + 1) * unitWidth;
+
+	//find closests vertex
+	float centerVertX, centerVertZ;
+	float highHighSqrDist = pow((player.translation.x - highX), 2) * pow((player.translation.z - highZ), 2);
+	float highLowSqrDist = pow((player.translation.x - highX), 2) * pow((player.translation.z - lowZ), 2);
+	float lowHighSqrDist = pow((player.translation.x - lowX), 2) * pow((player.translation.z - highZ), 2);
+	float lowLowSqrDist = pow((player.translation.x - lowX), 2) * pow((player.translation.z - lowZ), 2);
+
+	float lowestSqrDist = highHighSqrDist;
+	centerVertX = highX;
+	centerVertZ = highZ;
+
+	if (highLowSqrDist < lowestSqrDist)
 	{
-		delete triangles[i];
+		lowestSqrDist = highLowSqrDist;
+		centerVertX = highX;
+		centerVertZ = lowZ;
+	}
+	if (lowHighSqrDist < lowestSqrDist)
+	{
+		lowestSqrDist = lowHighSqrDist;
+		centerVertX = lowX;
+		centerVertZ = highZ;
+	}
+	if (lowLowSqrDist < lowestSqrDist)
+	{
+		lowestSqrDist = lowLowSqrDist;
+		centerVertX = lowX;
+		centerVertZ = lowZ;
+	}
+
+	glm::vec3 centerVertex(centerVertX, height, centerVertZ);
+
+	int lowerLevel = (int)(centerVertZ / unitLength) - 1;
+	int upperLevel = (int)(centerVertZ / unitLength);
+	int lowerBaseindex = (int)(centerVertX / unitWidth) * 2 - 1;
+	int upperBaseindex = lowerBaseindex - 1;
+	int totalTriangles = pow(4, iterations);
+	glm::vec3 v1, v2;
+	int labelNum, index;
+
+	//top left
+	v1 = centerVertex + glm::vec3(-unitWidth, 0.0f, 0.0f);
+	v2 = centerVertex + glm::vec3(-unitWidth / 2.0f, 0.0f, unitLength);
+	index = upperBaseindex;
+	if (ValidateCoord(upperLevel, index))
+	{
+		labelNum = SpatialIndexer::IndexFromPosition(upperLevel, index, sideUnits, iterations);
+		triangles.push_back(
+			std::make_unique<Triangle>(shader, textShader, camera, centerVertex, v1, v2, labelNum / totalTriangles, player, std::to_string(labelNum)));
+	}
+
+	//top mid
+	v1 = centerVertex + glm::vec3(-unitWidth / 2.0f, 0.0f, unitLength);
+	v2 = centerVertex + glm::vec3(unitWidth / 2.0f, 0.0f, unitLength);
+	index = upperBaseindex + 1;
+	if (ValidateCoord(upperLevel, index))
+	{
+		labelNum = SpatialIndexer::IndexFromPosition(upperLevel, index, sideUnits, iterations);
+		triangles.push_back(
+			std::make_unique<Triangle>(shader, textShader, camera, centerVertex, v1, v2, labelNum / totalTriangles, player, std::to_string(labelNum)));
+	}
+
+	//top right
+	v1 = centerVertex + glm::vec3(unitWidth, 0.0f, 0.0f);
+	v2 = centerVertex + glm::vec3(unitWidth / 2.0f, 0.0f, unitLength);
+	index = upperBaseindex + 2;
+	if (ValidateCoord(upperLevel, index))
+	{
+		labelNum = SpatialIndexer::IndexFromPosition(upperLevel, index, sideUnits, iterations);
+		triangles.push_back(
+			std::make_unique<Triangle>(shader, textShader, camera, centerVertex, v1, v2, labelNum / totalTriangles, player, std::to_string(labelNum)));
+	}
+
+	//bottom left
+	v1 = centerVertex + glm::vec3(-unitWidth, 0.0f, 0.0f);
+	v2 = centerVertex + glm::vec3(-unitWidth / 2.0f, 0.0f, -unitLength);
+	index = lowerBaseindex;
+	if (ValidateCoord(lowerLevel, index))
+	{
+		labelNum = SpatialIndexer::IndexFromPosition(lowerLevel, index, sideUnits, iterations);
+		triangles.push_back(
+			std::make_unique<Triangle>(shader, textShader, camera, centerVertex, v1, v2, labelNum / totalTriangles, player, std::to_string(labelNum)));
+	}
+
+	//bottom middle
+	v1 = centerVertex + glm::vec3(-unitWidth / 2.0f, 0.0f, -unitLength);
+	v2 = centerVertex + glm::vec3(unitWidth / 2.0f, 0.0f, -unitLength);
+	index = lowerBaseindex + 1;
+	if (ValidateCoord(lowerLevel, index))
+	{
+		labelNum = SpatialIndexer::IndexFromPosition(lowerLevel, index, sideUnits, iterations);
+		triangles.push_back(
+			std::make_unique<Triangle>(shader, textShader, camera, centerVertex, v1, v2, labelNum / totalTriangles, player, std::to_string(labelNum)));
+	}
+
+	//bottom right
+	v1 = centerVertex + glm::vec3(unitWidth, 0.0f, 0.0f);
+	v2 = centerVertex + glm::vec3(unitWidth / 2.0f, 0.0f, -unitLength);
+	index = lowerBaseindex + 2;
+	if (ValidateCoord(lowerLevel, index))
+	{
+		labelNum = SpatialIndexer::IndexFromPosition(lowerLevel, index, sideUnits, iterations);
+		triangles.push_back(
+			std::make_unique<Triangle>(shader, textShader, camera, centerVertex, v1, v2, labelNum / totalTriangles, player, std::to_string(labelNum)));
 	}
 }
 
@@ -73,10 +175,30 @@ std::vector<glm::vec3> Grid::GetTriangleWorldNormals()
 	}
 	return normals;
 }
+
 void Grid::Draw()
 {
 	for (int i = 0; i < triangles.size(); ++i)
 	{
 		triangles[i]->Draw();
 	}
+
+}
+
+bool Grid::ValidateCoord(int level, int index)
+{
+	if (level < 0 || index < 0)
+		return false;
+
+	if (level > sideUnits)
+		return false;
+
+	if (index > sideUnits * 2 - 4 * level)
+		return false;
+	return true;
+}
+
+void Grid::Update()
+{
+	FillTriangles();
 }

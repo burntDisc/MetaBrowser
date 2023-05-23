@@ -159,6 +159,25 @@ void Player::Update(double time)
 	if (length(velocity) > minVelocity)
 	{
 		translation = MotionHandler::CollideAndSlide(translation, velocity, timeDelta, surfaceNormal);
+		// correct for positive only bounds (TODO elegant)
+		if (translation.x < 0.0f)
+		{
+			translation.x = 0.0f;
+			if(velocity.x < 0.0f)
+				velocity.x = 0.0f;
+		}
+		if (translation.y < 0.0f)
+		{
+			translation.y = 0.0f;
+			if (velocity.y < 0.0f)
+				velocity.y = 0.0f;
+		}
+		if (translation.z < 0.0f)
+		{
+			translation.z = 0.0f;
+			if (velocity.z < 0.0f)
+				velocity.z = 0.0f;
+		}
 	}
 	else
 	{

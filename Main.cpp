@@ -85,24 +85,25 @@ int main()
 	Skybox skybox(skyboxShader, skyboxFacesDirectory);
 
 	// create player----------------------------------------------------------------------
-	Player player(glm::vec3(3.0f, 1000.0f, 10.0f));
+	Player player(glm::vec3(0.0f, 800.0f, 0.0f));
 
 	//create camera-----------------------------------------------------------------------
 	float FOV = 45.0f;
 	Camera camera(width, height, player.translation, player.orientation, FOV);
-	camera.SetSkyboxUniforms(skyboxShader);
+	camera.SetSkyboxUniforms(skyboxShader); 
 
 	// create Text
+	Text::LoadFont("arial.ttf");
 	glm::vec3 textTranslation1(100.0f, 100.0f, 100.0f);
 	glm::quat textRotation = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 textScale(1.0f, 1.0f, 1.0f);
-	Text text1(textShader, "two is the one", "arial.ttf", textTranslation1, textRotation, textScale, player);
+	Text text1(textShader, "two is the one", textTranslation1, textRotation, textScale, player);
 
 	glm::vec3 textTranslation0(-100.0f, 100.0f, 100.0f);
-	Text text0(textShader, "one is the zero", "arial.ttf", textTranslation0, textRotation, textScale, player);
+	Text text0(textShader, "one is the zero", textTranslation0, textRotation, textScale, player);
 
 	// create Triangle grid----------------------------------------------------------------------
-	Grid grid(rawShader, textShader, camera, 3000, 4, player);
+	Grid grid(rawShader, textShader, camera, 300, 4, player);
 	MotionHandler::AddSolidObject(&grid);
 
 	while (!glfwWindowShouldClose(window))
@@ -118,6 +119,7 @@ int main()
 		InputHandler::UpdateGamepad();
 		player.Update(time);
 
+		grid.Update();
 		grid.Draw();
 
 		//camera.SetSkyboxUniforms(skyboxShader);

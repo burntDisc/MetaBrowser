@@ -5,7 +5,7 @@
 class Drawable
 {
 public:
-	Drawable(Shader& shader, Camera& camera) : shader(shader), camera(camera){};
+	Drawable(Shader& shader, Camera& camera);
 	void Draw();
 
 protected:
