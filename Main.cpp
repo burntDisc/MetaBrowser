@@ -103,14 +103,14 @@ int main()
 	Text text0(textShader, "one is the zero", textTranslation0, textRotation, textScale, player);
 
 	// create Triangle grid----------------------------------------------------------------------
-	Grid grid(rawShader, textShader, camera, 300, 4, player);
+	Grid grid(rawShader, textShader, camera, 300, 10, player);
 	MotionHandler::AddSolidObject(&grid);
 
 	while (!glfwWindowShouldClose(window))
 	{
 		// Specify the color of the background GREEN For debug
 		// (Skybox Draws over)
-		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
 		// Clean the back buffer and depth buffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

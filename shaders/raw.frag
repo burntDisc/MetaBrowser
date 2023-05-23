@@ -11,5 +11,5 @@ void main()
 	FragColor[0] = VertColor[0];
 	FragColor[1] = VertColor[1];
 	FragColor[2] = VertColor[2];
-	FragColor[3] = 0.5;
+	FragColor[3] = 1.0;
 }
