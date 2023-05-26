@@ -95,7 +95,7 @@ void Grid::FillTriangles()
 	{
 		labelNum = SpatialIndexer::IndexFromPosition(upperLevel, index, sideUnits, iterations);
 		triangles.push_back(
-			std::make_unique<Triangle>(shader, textShader, camera, centerVertex, v1, v2, labelNum / 16.0f, player, "level:" + std::to_string(upperLevel) + " index:" + std::to_string(index)));
+			std::make_unique<Triangle>(shader, textShader, camera, centerVertex, v1, v2, labelNum / 16.0f, player, ToIP(labelNum)));
 	}
 
 	//top mid
@@ -106,7 +106,7 @@ void Grid::FillTriangles()
 	{
 		labelNum = SpatialIndexer::IndexFromPosition(upperLevel, index, sideUnits, iterations);
 		triangles.push_back(
-			std::make_unique<Triangle>(shader, textShader, camera, centerVertex, v1, v2, labelNum / 16.0f, player, "level:" + std::to_string(upperLevel) + " index:" + std::to_string(index)));
+			std::make_unique<Triangle>(shader, textShader, camera, centerVertex, v1, v2, labelNum / 16.0f, player, ToIP(labelNum)));
 	}
 
 	//top right
@@ -117,7 +117,7 @@ void Grid::FillTriangles()
 	{
 		labelNum = SpatialIndexer::IndexFromPosition(upperLevel, index, sideUnits, iterations);
 		triangles.push_back(
-			std::make_unique<Triangle>(shader, textShader, camera, centerVertex, v1, v2, labelNum / 16.0f, player, "level:" + std::to_string(upperLevel) + " index:" + std::to_string(index)));
+			std::make_unique<Triangle>(shader, textShader, camera, centerVertex, v1, v2, labelNum / 16.0f, player, ToIP(labelNum)));
 	}
 
 	//bottom left
@@ -128,7 +128,7 @@ void Grid::FillTriangles()
 	{
 		labelNum = SpatialIndexer::IndexFromPosition(lowerLevel, index, sideUnits, iterations);
 		triangles.push_back(
-			std::make_unique<Triangle>(shader, textShader, camera, centerVertex, v1, v2, labelNum / 16.0f, player, "level:" + std::to_string(lowerLevel) + " index:" + std::to_string(index)));
+			std::make_unique<Triangle>(shader, textShader, camera, centerVertex, v1, v2, labelNum / 16.0f, player, ToIP(labelNum)));
 	}
 
 	//bottom middle
@@ -139,7 +139,7 @@ void Grid::FillTriangles()
 	{
 		labelNum = SpatialIndexer::IndexFromPosition(lowerLevel, index, sideUnits, iterations);
 		triangles.push_back(
-			std::make_unique<Triangle>(shader, textShader, camera, centerVertex, v1, v2, labelNum / 16.0f, player, "level:" + std::to_string(lowerLevel) + " index:" + std::to_string(index)));
+			std::make_unique<Triangle>(shader, textShader, camera, centerVertex, v1, v2, labelNum / 16.0f, player, ToIP(labelNum)));
 	}
 
 	//bottom right
@@ -150,7 +150,7 @@ void Grid::FillTriangles()
 	{
 		labelNum = SpatialIndexer::IndexFromPosition(lowerLevel, index, sideUnits, iterations);
 		triangles.push_back(
-			std::make_unique<Triangle>(shader, textShader, camera, centerVertex, v1, v2, labelNum / 16.0f, player, "level:" + std::to_string(lowerLevel) + " index:" + std::to_string(index)));
+			std::make_unique<Triangle>(shader, textShader, camera, centerVertex, v1, v2, labelNum / 16.0f, player, ToIP(labelNum)));
 	}
 }
 
@@ -183,6 +183,34 @@ void Grid::Draw()
 		triangles[i]->Draw();
 	}
 
+}
+
+std::string Grid::ToIP(int input)
+{
+	int orderLower;
+	std::string IP = "";
+
+	while (IP.size() < 15)
+	{
+
+		if ((IP.size() + 1) % 4 == 0)
+		{
+			IP = ":" + IP;
+		}
+		if (input > 0)
+		{
+			orderLower = input / 10; // int casted to remove remainder
+			int digit = input - orderLower * 10;
+			input = orderLower;
+			IP = std::to_string(digit) + IP;
+		}
+		else
+		{
+			IP = "0" + IP;
+		}
+	}
+
+	return IP;
 }
 
 bool Grid::ValidateCoord(int level, int index)

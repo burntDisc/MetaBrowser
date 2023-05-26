@@ -18,6 +18,7 @@ public:
 	void Update();
 	bool ValidateCoord(int level, int index);
 private:
+	std::string ToIP(int input);
 	const float height = 500.0f;
 	Shader& textShader;
 	int sideUnits, iterations;
